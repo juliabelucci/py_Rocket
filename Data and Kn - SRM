@@ -1,0 +1,304 @@
+#Biblioteca utilizada para acessar base de dados
+import pandas as pd
+#Biblioteca utilizada para os cálculos
+import math
+#Bibliotecas utilizadas para plotar o gráfico
+import matplotlib.pyplot as plt
+import numpy as np
+
+title = input("Coloque um título: ")
+
+#Câmara do Motor 
+print("Dados da Câmara do Motor")
+print("")
+#Diâmetro interno da câmara
+Dc = int(input("Diâmetro interno da câmara em milímetro: "))
+#Comprimento interno da câmara
+Lc = float(input("Comprimento interno da câmara em milímetro: "))
+#Volume da câmara vazia
+Vc = (math.pi/4)*(Dc**2)*(Lc) 
+print("O Volume da câmara é ""%.0f"% Vc,"mm³")
+print("")
+
+#Grão Propelente
+print("Grão do Propelente")
+print("")
+#Tipo de grão propelente
+fueltype = 0
+while fueltype == 0:
+    prop = input("""Escreva o tipo do propelente: 
+    Escolha entre as opções
+    KNDX
+    KNSB fine
+    KNSB coarse
+    KNSU
+    KNER coarse
+    KNMN coarse
+    """)
+    if prop == "KNDX":
+        fueltype = 1
+    elif prop == "KNSB fine":
+        fueltype = 2
+    elif prop == "KNSB coarse":
+        fueltype = 3
+    elif prop == "KNSU":
+        fueltype = 4
+    elif prop == "KNER" or prop == "KNER coarse":
+        fueltype = 5
+    elif prop == "KNMN" or prop == "KNMN coarse":
+        fueltype = 6
+    else:
+        fueltype = 0
+        print("Resposta inválida")
+#Diâmetro inicial externo do grão
+Do = float(input("Diâmetro externo inicial em milímetro: "))
+#Diâmetro inicial do núcleo do grão
+do = int(input("Diâmetro do núcleo inicial em milímetro: "))
+#Comprimento inicial do segmento do grão
+Lo = float(input("Comprimento do segmento inicial em milímetro: "))
+#Número de segmentos do grão
+N = int(input("Número de segmentos: "))
+
+#Inibidores
+#Superfície externa
+osi = -1
+while osi < 0:
+    SE = input("A superfície externa é Exposta ou Inibida? ")
+    if SE == "Exposta":
+        osi = 1
+    elif SE == "Inibida":
+        osi = 0
+    else:
+        osi = osi
+        print("Resposta inválida")
+#Superfícia do núcleo
+ci = -1
+while ci < 0:
+    SN = input("A superfície do núcleo é Exposta ou Inibida? ")
+    if SN == "Exposta":
+        ci = 1
+    elif SN == "Inibida":
+        ci = 0
+    else:
+        osi = osi
+        print("Resposta inválida")
+#Superfície final
+ei = -1
+while ei < 0:
+    FS = input("O final da superfície é Exposta ou Inibida? ")
+    if FS == "Exposta":
+        ei = 1
+    elif FS == "Inibida":
+        ei = 0
+    else:
+        osi = osi
+        print("Resposta inválida")
+print("")
+
+#Comprimento do grão inicial
+Lgo = N*Lo
+print("O comprimento do grão inicial é", Lgo, "mm")
+
+#Volume do grão inicial
+Vgd = ((Do**2)-(do**2))*Lgo
+Vg = (math.pi/4)*Vgd
+print("O volume do grão inicial é ""%.0f"% Vg, "mm³")
+
+#Fração de volume utilizada
+Vl = Vg/Vc
+print("A fração de volume utilizada é ""%.3f"% Vl)
+
+#Densidade ideal do grão
+Dados_propelente = pd.read_excel("Densidade ideal.xlsx")
+pig = Dados_propelente[fueltype].loc[0]
+print("A densidade ideal do grão é ", pig, "g/cm³")
+
+#Relação de densidade (real/ideal)
+dg = float(input("Densidade real do grão "))
+
+#Atual densidade do grão
+pg = pig*dg
+print("A atual densidade do grão é ""%.3f"%pg,"g/cm³")
+
+#Massa do grão inicial 
+mg = pg*(Vg/10**6)
+print("A massa do grão do inicial é ""%.3f"% mg, "kg")
+
+#Final da área de queima inicial
+Abeo = N*2*ei*math.pi/4*(Do**2-do**2)
+print("O final da área de queima inicial é ""%.0f"% Abeo, "mm²")
+
+#Área de queima inicial do núcleo
+Abco = N*ci*math.pi*do*Lo
+print("A área de queima inicial do núcleo é ""%.0f"% Abco, "mm²")
+
+#Área de queima da superfície externa inicial
+Abso = N*osi*math.pi*Do*Lo
+print("A área de queima inicial da superfície externa é ""%.0f"% Abso, "mm²")
+
+#Área de queima total inicial
+Abo = Abeo+Abco+Abso
+print("Área de queima total inicial é ""%.0f"% Abo, "mm²")
+
+#Alvo Meop
+Press = (input("Digite a pressão com a unidade de medida como Mpa ou psi: "))
+Pressures = pd.read_excel("Pressao.xlsx")
+filtro = Pressures.set_index("Pressure")
+P = filtro["Mpa"].loc[Press]
+if P < 3 and fueltype == 1:
+    fueltype = 1.1
+elif P > 3 and P < 6 and fueltype == 1:
+    fueltype = 1.2
+elif P > 6 and fueltype == 1:
+    fueltype = 1.3
+ef = float(input("Ocorre erosão no bocal? Caso a resposta seja negativa insira o valor zero: "))
+
+#Kn max
+Kn_eq = pd.read_excel("Kn max.xlsx")
+filtro_kn = Kn_eq.set_index("order")
+a = filtro_kn["a"].loc[fueltype]
+b = filtro_kn["b"].loc[fueltype]
+c = filtro_kn["c"].loc[fueltype]
+d = filtro_kn["d"].loc[fueltype]
+e = filtro_kn["e"].loc[fueltype]
+f = filtro_kn["f"].loc[fueltype]
+g = filtro_kn["g"].loc[fueltype]
+Kn = a+b*P+c*P**2+d*P**3+e*P**4+f*P**5+g*P**6
+print("O Kn máximo é ""%.0f"% Kn) 
+    
+#Tabela
+x = [0]
+x_inc = (Do-do)/(100*(ci+osi))
+for i in range(1,51):
+    xf = x_inc*i
+    x.append(xf)
+
+d = []
+for i in range(0,51):
+    df = do+(ci*2*(x[i]))
+    d.append(df)
+
+D = []
+for i in range(0,51):
+    Df = Do-(osi*2*(x[i]))
+    D.append(Df)
+
+L = []
+for i in range(0,51):
+    Lf = Lgo-(ei*N*2*(x[i]))
+    L.append(Lf)
+
+T_web = []
+for i in range(0,51):
+    T_webf = (D[i]-d[i])/2
+    T_web.append(T_webf)
+
+Abc = []
+for i in range(0,51):
+    Abcf = (ci*math.pi*d[i]*L[i])
+    Abc.append(Abcf)
+        
+Abs = []
+for i in range(0,51):
+    Absf = (osi*math.pi*D[i]*L[i])
+    Abs.append(Absf)
+
+Abe = []
+for i in range(0,51):
+    Abef = ((ei*2*N*math.pi/4*(D[i]**2-d[i]**2)))
+    Abe.append(Abef)
+        
+Abt = []
+for i in range(0,51):
+    Abtf = (ci*math.pi*d[i]*L[i]+osi*math.pi*D[i]*L[i]+(ei*2*N*math.pi/4*(D[i]**2-d[i]**2)))
+    Abt.append(Abtf)
+
+Abtm = max(Abt)
+    
+#Bocal
+print("Informações do Bocal")
+Ato = Abtm/Kn
+print("A área da secção transversal da garganta inicial em mm² é ""%.0f"%Ato)
+Dto = math.sqrt((4*Ato)/math.pi)
+print("O diâmetro da garganta inicial é ""%.3f"%Dto)
+Dtofinal = Dto + ef
+print("O diâmetro da garganta final é ""%.2f"%Dtofinal)
+    
+#Final Tabela
+At = []
+for i in range(0,51):
+    Atf = math.pi/4*(Dto+ef*(T_web[0]-T_web[i])/T_web[0])**2
+    At.append(Atf)
+        
+Knl = []
+for i in range(0,51):
+    Knlf = (Abt[i]/At[i])
+    Knl.append(Knlf)
+    
+#Informações Gráfico
+def Kn_cal(x_inc,z):
+    D_cal = Do-osi*2*x_inc*z
+    d_cal = do+ci*2*x_inc*z
+    Dt_cal = Do-osi*2*x_inc
+    dt_cal = do+ci*2*x_inc
+    L_cal = Lgo-ei*2*N*x_inc*z
+    two_cal = (Dt_cal-dt_cal)/2
+    tweb_cal = (D_cal-d_cal)/2
+    Abe_cal = (ei*2*N*math.pi)/4*(D_cal**2-d_cal**2)
+    Abc_cal = ci*math.pi*d_cal*L_cal
+    Abs_cal = osi*math.pi*D_cal*L_cal
+    Abt_cal = Abe_cal+Abc_cal+Abs_cal
+    At_cal = math.pi/4*(Dto+ef*(two_cal-tweb_cal)/two_cal)**2
+    return Abt_cal/At_cal
+def t_web_cal(x_inc,z):
+    D_cal = Do-osi*2*x_inc*z
+    d_cal = do+ci*2*x_inc*z
+    return (D_cal-d_cal)/2
+
+zig = np.arange(0,51,0.01)
+
+fig, ax1 = plt.subplots()
+
+color = 'tab:blue'
+ax1.set_xlabel('Regressão do Entrelaçamento (mm)')
+ax1.set_ylabel('Kn', color=color)
+ax1.plot(Kn_cal(x_inc, zig), color=color)
+ax1.tick_params(axis='y', labelcolor=color)
+
+ax2 = ax1.twinx()
+
+color = 'tab:orange'
+ax2.set_ylabel('Espessura do Entrelaçamento', color=color)
+ax2.plot(t_web_cal(x_inc,zig), color=color)
+ax2.tick_params(axis = 'y', labelcolor=color)
+
+fig.tight_layout()
+plt.grid()
+plt.show()
+        
+#Tabela plot
+print(title)
+x = [round(i,2) for i in x]
+d = [round(i,2) for i in d]
+D = [round(i,2) for i in D]
+L = [round(i,1) for i in L]
+T_web = [round(i,2) for i in T_web]
+Abe = [round(i,0) for i in Abe]
+Abc = [round(i,0) for i in Abc]
+Abs = [round(i,0) for i in Abs]
+Abt = [round(i,0) for i in Abt]
+At = [round(i,1) for i in At]
+Knl = [round(i,1) for i in Knl]
+data = {'x': x,
+        'd': d,
+        'D': D,
+        'L': L,
+        'tweb': T_web,
+        'Abe': Abe,
+        'Abc': Abc,
+        'Abs': Abs,
+        'Abt': Abt,
+        'At': At,
+        'Kn': Knl}
+tabela_completa = pd.DataFrame(data)
+print(tabela_completa)
