@@ -1,5 +1,5 @@
 # py_Rocket
-Richard Nakka é um grande nome no ramo de foguetemodelismo, após anos de pesquisa desenvolveu ferramentas que facilitam os cálculos para o desenvolvimento de foguetes motores que utilizam grão propelente sólido. Em seu site são disponibilizadas algumas planilhas no formato excel que podem ser utilizadas em conjunto para obter um melhor desempenho no lançamento do motor foguete.
+Richard Nakka é um grande nome no ramo de foguetemodelismo, após anos de pesquisa desenvolveu ferramentas que facilitam os cálculos para o desenvolvimento de foguetes motores que utilizam grão propelente sólido. Em seu site são disponibilizadas algumas planilhas no formato excel que podem ser utilizadas em conjunto para obter um melhor desempenho no lançamento de um motor foguete.
 
 O Objetivo do projeto de iniciação científica, aqui apresentado, ́e a construção de uma ferramenta que facilite o desenvolvimentodo foguete. A construção do pacote pyRocket, que abriga os modulos adaptando as planilhas: Casing, SRM, Ezalt e O-ring, permite a troca de dados e a interação entre planilhas de forma eficiente e direta, tornando a construção dos foguetes cada vez mais fáceis.
 
