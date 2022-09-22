@@ -9,7 +9,7 @@ Esse trabalho é uma continuação do que foi feito por @LucasValentimB, e nesse
 
 #Como executar o projeto
 
-Para executar o projeto é necessário instalar em sua máquina o Python através do link [https://www.python.org/downloads/], além disso é necessário os seguintes pacotes python: math, matplotlib.plot, pandas e numpy.
+Para executar o projeto é necessário instalar em sua máquina o Python através do link [https://www.python.org/downloads/], e além disso é necessário os seguintes pacotes python: math, matplotlib.plot, pandas e numpy.
 
 Outro detalhe, é necessário que as planilhas utilizadas como base de dados pelo código (disponibilizadas aqui na repositório) devem estar salvas na mesma pasta que o código para que ele possa funcionar corretamente.
 
